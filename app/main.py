@@ -27,18 +27,25 @@ def run():
         category = result['category'].strip().lower()
         if "very important" in category:
             stats["very important"] += 1
+            print("⭐ Starring important email...")
+            email['service'].users().messages().modify(
+                userId='me',
+                id=email['id'],
+                body={"addLabelIds": ["STARRED"]}
+            ).execute()
+            print("✅ Starred successfully.")
         elif "regular" in category:
             stats["regular"] += 1
         elif "spam" in category or "promotional" in category:
             stats["spam"] += 1
-            print("📦 Auto-archiving spam...")
+            print("📦 Archiving and marking spam as read...")
             if 'id' in email:
                 email['service'].users().messages().modify(
                     userId='me',
                     id=email['id'],
-                    body={"removeLabelIds": ["INBOX"]}
+                    body={"removeLabelIds": ["INBOX", "UNREAD"]}
                 ).execute()
-                print("✅ Archived successfully.")
+                print("✅ Archived and marked as read successfully.")
         else:
             stats["error"] += 1
 
